@@ -1,0 +1,187 @@
+--SELEÇÃO SIMPLES
+--1 - Liste todos os setores da empresa.
+select nome_setor
+from setor;
+--2 - Quais são os funcionários da empresa?
+select nome_empregado
+from empregado;
+--3 - Liste todos os dados dos dependentes.
+select *
+from dependente;
+--4 - De quais tipos os dependentes podem ser?
+
+select nome_Tipo
+from tipo;
+--5 - Quais os setores de produção da empresa?
+select nome_setor
+from setor;
+--6 - Liste apenas o nome e a data de nascimento dos dependentes.
+select nome_dependente, dt_nascimento
+from dependente;
+--7 - Refaça o exercício anterior ordenando do mais novo para o mais velho.
+select nome_dependente,dt_nascimento
+from dependente order by (dt_nascimento),'yyyy/mm/dd' ; 
+--8 - Qual o dependente de código 5?
+select Nome_dependente
+from dependente
+where cod_dependente = '5';
+--9 - Quais os dependentes do 'Homer Simpson'?
+select nome_dependente
+from dependente d, empregado e
+where d.cod_empregado =e.cod_empregado
+and lower(nome_empregado) = 'homer simpson';
+
+--10 - De quem o 'Zezé Pêra' é dependente?
+select Nome_empregado
+from dependente d, empregado e
+where d.cod_empregado =e.cod_empregado
+and lower(d.nome_dependente) = 'zezé pêra';
+
+--11 - Quais dependentes têm o nome começado pela letra 'M'?
+select nome_dependente
+from dependente
+where lower(nome_dependente) like 'm%';
+
+--12 - Quais os funcionários tem o nome terminado por 'son'?
+select nome_empregado
+from empregado
+where lower (nome_empregado) like '%son';
+
+--13 - Quais funcionários NÃO têm o nome iniciado por 'Pat'?
+select nome_empregado
+from empregado
+where lower(nome_empregado) not LIKE 'pat%';
+--14 - Qual funcionário tem o salário inferior ou igual a R$ 1000,00?
+select nome_empregado
+from empregado
+where salario <='1000';
+--15 - Qual empregado tem salário entre R$2000 e R$3000?
+select nome_empregado
+from empregado
+where salario BETWEEN '2000' and '3000';
+--16 – Qual o funcionário foi admitido em 30/04/2012?
+select nome_empregado
+from empregado
+where to_char(admissao,'dd/mm/yyyy' )='30/04/2012';
+
+--17 - Quais os funcionários foram admitidos no mês de maio?
+select nome_empregado
+from empregado
+where to_char (admissao, 'mm')='05';
+--18 - Quais empregados foram admitidos entre 10/05/2012 e 30/05/2012?
+select nome_empregado,to_char(admissao,'dd/mm/yyyy')
+from empregado
+where to_char(admissao,'yyyy/mm/dd') >= '2012/05/10' 
+and to_char(admissao,'yyyy/mm/dd') <='2012/05/30';
+
+--19 - Quais dependentes nasceram em 2004?
+select nome_dependente
+from dependente
+where to_char(dt_nascimento,'yyyy')= '2004';
+
+--20 - Qual o menor salário?
+select min (salario)
+from empregado;
+--21 - Qual a médiasalarial da empresa?
+select avg (salario)
+from empregado;
+--22 - Qual a idade em anos da 'Margarida'?
+select TRUNC((SYSDATE - dt_nascimento) /'365')
+from dependente
+where lower(nome_dependente) = 'margarida';
+
+--23 - Quais dependentes têm data de nascimento não registrada (nulas)?
+select nome_dependente
+from dependente
+where dt_nascimento  is null;
+
+                        --RELACIONAMENTOS (JOINS)
+                        
+--24 - Quais os tipos de dependentes do 'Pato Donald'?
+select distinct nome_tipo
+from tipo t,dependente d ,empregado e 
+where t.cod_tipo = d.cod_tipo
+and d.cod_empregado = e.cod_empregado
+and lower(nome_empregado)= 'pato donald';
+
+--25 - Quais empregados trabalham no setor de 'Produção de Sólidos'?
+select nome_empregado
+from empregado e, setor s
+where s.cod_setor = e.cod_setor
+and lower(nome_setor)= 'produção de sólidos';
+
+--26 - Quais são os agregados e seus respectivos responsáveis?
+select nome_empregado, nome_dependente
+from dependente d, empregado e
+where d.cod_empregado = e.cod_empregado;
+
+--27 - Quais os dependentes dos empregados que trabalham na 'Diretoria'?
+select nome_dependente
+from dependente d, empregado e, setor s
+where d.cod_empregado = e.cod_empregado
+and e.cod_setor = s.cod_setor
+and lower(nome_setor) = 'diretoria';
+
+--28 - Quais os dependentes do 'Pato Donald', do 'Homer Simpson', do 'Cebolinha' e do 'Pateta'?
+select nome_empregado,nome_dependente
+from empregado e, dependente d
+where e.cod_empregado = d.cod_empregado
+and lower(nome_empregado) = 'pato donald'
+or lower(nome_empregado) = 'homer simpson'
+or lower (nome_empregado)= 'cebolinha'
+or lower (nome_empregado)= 'pateta';
+
+--29 - Quais funcionários têm dependentes?
+select distinct nome_empregado
+from empregado e, dependente d
+where e.cod_empregado = d.cod_empregado;
+
+--30 - Quantos empregados existem no setor de 'Produção de Sólidos'?
+select count (nome_empregado)
+from empregado e, setor s
+where s.cod_setor = e.cod_setor
+and lower(nome_setor) = 'produção de sólidos';
+
+--31 - Quantos são os dependentes do tipo 'Agregado'?
+select count(nome_dependente)
+from tipo t, dependente d
+where t.cod_tipo = d.cod_tipo
+and lower (nome_tipo)= 'agregado';
+ 
+-------------SUBSELECT
+--32 - Quais setores não têm nenhum dependente vinculado?
+select nome_setor, cod_setor
+from setor
+where cod_setor not in (
+
+select s.cod_setor
+from setor s, empregado e, dependente d
+where s.cod_setor = e.cod_setor
+and e.cod_empregado = d.cod_empregado);
+
+--33 - Quem é o dependente mais velho?
+select min (dt_nascimento)
+from dependente;
+
+--34 - Quais os empregados recebem abaixo da média salarial?
+select nome_empregado
+from empregado
+where salario <  (
+select avg(salario)
+from empregado);
+
+--35 - Qual o funcionário mais antigo de empresa?
+select nome_empregado
+from empregado
+where admissao =(
+select min (admissao)
+from empregado);
+
+--36 - De quem é o menor salário?
+select nome_empregado
+from empregado
+where salario =(
+
+select min(salario)
+from empregado);
+
